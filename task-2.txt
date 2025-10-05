@@ -1,4 +1,109 @@
-Öğrenci No:
-AD-SOYAD:
+Öğrenci No:250542002
+AD-SOYAD:Pelinay KOŞAN
 
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+
+BAŞLA
+
+    // Başlangıç değişkenleri
+    PARA ← 1500
+    KONUM ← 0
+    MAL_VARLIKLARI ← []
+    TUR_SAYISI ← 0
+    RAKIPLER ← {R1, R2, R3}
+    OYUN_DEVAM ← TRUE
+
+    // Oyun devam ettiği sürece
+    WHILE OYUN_DEVAM = TRUE DO
+
+        TUR_SAYISI ← TUR_SAYISI + 1
+        YAZ("Tur: ", TUR_SAYISI)
+
+        // Zar atma
+        ZAR ← ZAR_AT()
+        KONUM ← (KONUM + ZAR) MOD 40
+
+        // Alan türünü belirle
+        ALAN_TURU ← ALAN_TIPI(KONUM)
+
+        // Karar verme mantığı
+        EĞER ALAN_TURU = "SATILIK_MULK" İSE
+            DEĞER ← MULK_DEGERI(KONUM)
+            KAZANC_POTANSIYELI ← KIRA_GETIRISI(KONUM)
+
+            EĞER PARA > DEĞER VE KAZANC_POTANSIYELI > 0.1 * DEĞER İSE
+                SATIN_AL(KONUM)
+                PARA ← PARA - DEĞER
+                MAL_VARLIKLARI ← MAL_VARLIKLARI ∪ {KONUM}
+                YAZ("Yeni mülk satın alındı!")
+            DEĞİLSE
+                YAZ("Bu mülk riskli, satın alınmadı.")
+            SON
+        SON
+
+        // Rakip hareketlerini öngör
+        HER_BIR RAKIP İÇİN RAKIPLERDE
+            RAKIP_KONUM ← RAKIP_DURUMU(RAKIP)
+            RAKIP_STRATEJI ← TAHMIN_ET(RAKIP_KONUM, RAKIP_EGILIMI)
+
+            EĞER RAKIP_STRATEJI = "AGRESIF_ALIM" İSE
+                YAZ(RAKIP, " muhtemelen bu turda mülk alacak.")
+            EĞER RAKIP_STRATEJI = "KIRA_ODENMEDEN_KACIN" İSE
+                YAZ(RAKIP, " riskli bölgelerden kaçıyor.")
+            SON
+        SON
+
+        // Kira ödeme
+        EĞER ALAN_TURU = "BASKASINA_AIT" İSE
+            KIRA ← KIRA_MIKTARI(KONUM)
+            PARA ← PARA - KIRA
+            YAZ("Kira ödendi: ", KIRA)
+        SON
+
+        // Şans veya kamu fonu kartları
+        EĞER ALAN_TURU = "SANS" VEYA ALAN_TURU = "KAMU_FONU" İSE
+            KART ← KART_CEK()
+            KART_ETKISINI_UYGULA(KART)
+        SON
+
+        // Mülk geliştirme (ev/hotel)
+        HER_BIR MULK İÇİN MAL_VARLIKLARI
+            EĞER PARA > 200 VE KIRA_GETIRISI(MULK) ARTIRILABİLİR_Mİ() = TRUE İSE
+                YATIRIM_YAP(MULK)
+                PARA ← PARA - 200
+                YAZ(MULK, " geliştirildi.")
+            SON
+        SON
+
+        // İflas kontrolü
+        EĞER PARA ≤ 0 İSE
+            YAZ("İflas ettiniz!")
+            OYUN_DEVAM ← FALSE
+        SON
+
+        // Oyunun bitiş koşulu (turlar veya iflas)
+        EĞER TUR_SAYISI ≥ 100 VEYA RAKIPLERIN_COGU_IFLAS() = TRUE İSE
+            OYUN_DEVAM ← FALSE
+        SON
+
+    SON WHILE
+
+    // Oyun Sonu
+    TOPLAM_DEGER ← PARA + MÜLK_DEĞER_TOPLAMI(MAL_VARLIKLARI)
+    YAZ("Oyun bitti! Toplam servet: ", TOPLAM_DEGER)
+    YAZ("Toplam mülk sayısı: ", UZUNLUK(MAL_VARLIKLARI))
+
+BİTİR
+
+EK ÖZELLİK
+
+FONKSIYON TAHMIN_ET(KONUM, EĞILIM)
+    EĞER EĞILIM = "AGRESIF" VE KONUM SATILIK_MULK_YAKININDA İSE
+        DÖNDÜR "AGRESIF_ALIM"
+    EĞER EĞILIM = "KORUMACI" VE KONUM YÜKSEK_KIRA_ALANINA_YAKIN İSE
+        DÖNDÜR "KIRA_ODENMEDEN_KACIN"
+    DEĞİLSE
+        DÖNDÜR "NÖTR"
+    SON
+SON FONKSIYON
+
