@@ -1,4 +1,175 @@
-Öğrenci No:
-AD-SOYAD:
+Öğrenci No:250542002
+AD-SOYAD:Pelinay KOŞAN
 
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+
+
+BAŞLA
+
+    // --- Ayarlar / Sabitler ---
+    MAX_RETAKE ← 6                 // maksimum yeniden çekim sayısı
+    MIN_FEEDBACK_SCORE ← 0.75      // 0..1 arası; ≥ ise kabul
+    GRID_ON ← TRUE                 // kılavuz çizgileri (rule-of-thirds)
+    USE_PORTRAIT_MODE ← TRUE
+    FLASH_MODE ← "AUTO"            // "ON", "OFF", "AUTO"
+    TIMER_SECONDS ← 0              // 0 = anlık, 2,3,5,10 gibi değerler olabilir
+    PREFERRED_CAMERA ← "front"     // "front" veya "back"
+    GOLDEN_HOUR_WINDOW ← TRUE      // doğal ışık tercihi (isteğe bağlı)
+
+    // --- Başlangıç durumu ---
+    kamera ← INIT_CAMERA(PREFERRED_CAMERA)
+    ayarlar ← DEFAULT_CAMERA_SETTINGS()
+    ayarlar.grid ← GRID_ON
+    ayarlar.portrait ← USE_PORTRAIT_MODE
+    ayarlar.flash ← FLASH_MODE
+    ayarlar.timer ← TIMER_SECONDS
+
+    // --- Yardımcı Fonksiyonlar (kısa açıklama ile) ---
+    FONKSIYON CHECK_LIGHTING()
+        // ışık yeterli mi? (ör. parlaklık, gölge analizi)
+        // döndür: "GOOD", "SOFT", "LOW", "BACKLIT"
+    SON
+
+    FONKSIYON ADJUST_FOR_LIGHTING(mode)
+        // ışığa göre pozlama, HDR, yön değişikliği öner
+    SON
+
+    FONKSIYON CHECK_BACKGROUND()
+        // arka plan karmaşası, dikkat dağıtıcı objeler var mı?
+        // döndür TRUE/FALSE
+    SON
+
+    FONKSIYON FRAME_COMPOSITION(useGrid)
+        // rule-of-thirds veya merkezleme kontrolü
+        // döndür: "GOOD", "ADJUST_LEFT", "ADJUST_RIGHT", "MOVE_CLOSER", "MOVE_AWAY"
+    SON
+
+    FONKSIYON DETECT_EXPRESSION()
+        // gülümseme, göz açık mı, doğal ifade mi?
+        // döndür: [smileScore (0..1), eyesOpen (TRUE/FALSE)]
+    SON
+
+    FONKSIYON AUTO_FOCUS_AND_EXPOSE()
+        // odak ve pozlamayı uygula; döndür TRUE (başarılı) / FALSE
+    SON
+
+    FONKSIYON TAKE_PHOTO(timer, burst)
+        // timer ile say ve burst (çoklu) çekim yap
+        // döndür: liste halinde fotoğraf objeleri
+    SON
+
+    FONKSIYON EVALUATE_PHOTO(photo)
+        // fotoğrafı değerlendir: netlik, parlaklık, kompozisyon, ifade
+        // döndür: feedbackScore (0..1) ve nedenler listesi
+    SON
+
+    FONKSIYON QUICK_EDIT(photo)
+        // otomatik düzeltmeler: kırpma, parlaklık, kontrast, hafif rötuş
+        // döndür: düzenlenmiş fotoğraf
+    SON
+
+    // --- Hazırlık Aşaması ---
+    YAZ("Selfie çekimine hazırlanılıyor...")
+
+    // Işık kontrolü
+    ışıkDurumu ← CHECK_LIGHTING()
+    EĞER ışıkDurumu = "LOW" İSE
+        YAZ("Işık düşük — mümkünse daha aydınlık bir yere geç veya ek ışık kullan.")
+        ADJUST_FOR_LIGHTING("increase_light")
+    DEĞİLSE EĞER ışıkDurumu = "BACKLIT" İSE
+        YAZ("Sırt ışığı var — yüzünü ışığa doğru çevir veya gölgeyi azalt.")
+        ADJUST_FOR_LIGHTING("reposition")
+    SON
+
+    // Arka plan kontrolü
+    EĞER CHECK_BACKGROUND() = FALSE İSE
+        YAZ("Arka plan dikkat dağıtıyor — temizle veya pozisyonu değiştir.")
+    SON
+
+    // Kamerayı ve ayarları hazırla
+    APPLY_CAMERA_SETTINGS(kamera, ayarlar)
+    YAZ("Ayarlar uygulandı: Grid=", GRID_ON, ", Portrait=", USE_PORTRAIT_MODE)
+
+    // --- Poz/Hareket ve Kompozisyon Aşaması ---
+    YAZ("Poz ve kompozisyon kontrol ediliyor...")
+    comp ← FRAME_COMPOSITION(GRID_ON)
+    EĞER comp ≠ "GOOD" İSE
+        YAZ("Kompozisyon önerisi: ", comp)
+        // kullanıcının küçük düzeltmeler yapmasını bekle (manuel)
+    SON
+
+    // Göz teması ve ifade kontrolü (kısa talimat)
+    [smileScore, eyesOpen] ← DETECT_EXPRESSION()
+    EĞER eyesOpen = FALSE İSE
+        YAZ("Gözler kapalı — tekrar dene.")
+    SON
+    EĞER smileScore < 0.4 İSE
+        YAZ("Daha doğal bir ifade için hafifçe gülümse.")
+    SON
+
+    // --- Çekim Döngüsü (Retake mekanizması) ---
+    retake ← 0
+    bestPhoto ← NULL
+    bestScore ← 0.0
+
+    WHILE retake < MAX_RETAKE DO
+        retake ← retake + 1
+        YAZ("Çekim denemesi #", retake, " başlıyor...")
+
+        // Otomatik odak ve pozlama uygula
+        başarılı ← AUTO_FOCUS_AND_EXPOSE()
+        EĞER başarılı = FALSE İSE
+            YAZ("Odak/pozlama başarısız — yeniden dene.")
+            CONTINUE
+        SON
+
+        // Fotoğraf çek (ör. burst ile 3 fotoğraf)
+        fotos ← TAKE_PHOTO(ayarlar.timer, burst=3)
+
+        // Her fotoğrafı değerlendir
+        HER_BIR f İÇİN fotos
+            [score, nedenler] ← EVALUATE_PHOTO(f)
+            YAZ("Fotoğraf değerlendirme: skor=", score, ", nedenler=", nedenler)
+
+            EĞER score > bestScore İSE
+                bestScore ← score
+                bestPhoto ← f
+            SON
+        SON
+
+        // Kabul edilebilirse çık
+        EĞER bestScore ≥ MIN_FEEDBACK_SCORE İSE
+            YAZ("Yeterli kaliteye ulaşılmış: skor=", bestScore)
+            BREAK
+        DEĞİLSE
+            YAZ("İyileştirme önerileri: ")
+            // örnek öneriler: ışığı değiştir, açı değiştir, ifadeyi düzelt
+            YAZ("- Işığı kontrol et, açıyı +/- 10° değiştir, daha doğal ifade dene")
+            YAZ("Tekrar dene...")
+        SON
+
+    SON WHILE
+
+    // Eğer hiçbir fotoğraf yeterli değilse, yine de en iyisini al
+    EĞER bestPhoto = NULL İSE
+        YAZ("Hiç uygun fotoğraf bulunamadı. Son çekimlerden en iyisi seçiliyor.")
+        bestPhoto ← fotos[0]    // fallback
+    SON
+
+    // --- Hızlı Düzenleme ve Kaydetme ---
+    YAZ("Otomatik düzenlemeler uygulanıyor...")
+    finalPhoto ← QUICK_EDIT(bestPhoto)
+
+    YAZ("Sonuç skoru: ", bestScore)
+    YAZ("Selfie hazır! Kaydediliyor...")
+    SAVE_PHOTO(finalPhoto, album="Selfies")
+
+    // --- Opsiyonel: Paylaşım ---
+    SOR ← USER_CONFIRM("Fotoğrafı paylaşmak ister misin? (E/H)")
+    EĞER SOR = "E" İSE
+        SHARE_PHOTO(finalPhoto)
+    SON
+
+    YAZ("Selfie süreci tamamlandı. İyi çekimler!")
+
+BİTİR
