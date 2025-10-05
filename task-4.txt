@@ -1,4 +1,105 @@
-Öğrenci No:
-AD-SOYAD:
+Öğrenci No:250542002
+AD-SOYAD:Pelinay KOŞAN
 
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+
+BAŞLA
+
+    // --- Girdi / Ayarlar ---
+    HEDEF ← (R: 200, G: 100, B: 50)            // örnek hedef renk
+    PALET ← [ (R:255,G:255,B:255), (R:255,G:0,B:0), (R:0,G:255,B:0), (R:0,G:0,B:255), (R:0,G:0,B:0) ]
+    MEVCUT ← PALET[0]                          // başlangıç: beyaz veya seçilmiş başlangıç renk
+    TOLERANS ← 5.0                             // hedefle kabul edilebilir uzaklık
+    MAX_ADIM ← 100
+    ITER ← 0
+
+    // Adım oranı denenecek değerler (ilk başta daha büyük, sonra küçültebiliriz)
+    ADIM_ORANLARI ← [0.25, 0.15, 0.08, 0.04, 0.02]
+
+    // --- Fonksiyonlar ---
+    FONKSIYON CLAMP(v)
+        EĞER v < 0 İSE DÖNDÜR 0
+        EĞER v > 255 İSE DÖNDÜR 255
+        DÖNDÜR ROUND(v)
+    SON
+
+    FONKSIYON DISTANCE(c1, c2)
+        dR ← c1.R - c2.R
+        dG ← c1.G - c2.G
+        dB ← c1.B - c2.B
+        DÖNDÜR SQRT(dR*dR + dG*dG + dB*dB)
+    SON
+
+    FONKSIYON MIX(base, add, ratio)
+        newR ← CLAMP(base.R * (1 - ratio) + add.R * ratio)
+        newG ← CLAMP(base.G * (1 - ratio) + add.G * ratio)
+        newB ← CLAMP(base.B * (1 - ratio) + add.B * ratio)
+        DÖNDÜR (R: newR, G: newG, B: newB)
+    SON
+
+    // Bu fonksiyon paletin her rengi ve her ratio için deneme yapar,
+    // hedefe en çok yaklaşmayı sağlayan (mesafe azalımı en büyük) karışımı döndürür.
+    FONKSIYON BEST_MIX_CANDIDATE(base, target, palet, oran_listesi)
+        enIyi ← NULL
+        enIyiAzalım ← 0.0
+        baseDist ← DISTANCE(base, target)
+
+        HER_BIR renk İÇİN palet
+            HER_BIR r ORAN İÇİN oran_listesi
+                deneme ← MIX(base, renk, r)
+                yeniDist ← DISTANCE(deneme, target)
+                azalım ← baseDist - yeniDist    // pozitifse iyileşme var
+                EĞER azalım > enIyiAzalım İSE
+                    enIyiAzalım ← azalım
+                    enIyi ← {renk: renk, oran: r, sonuc: deneme, yeniDist: yeniDist}
+                SON
+            SON
+        SON
+
+        DÖNDÜR enIyi      // NULL dönebilir (hiç iyileşme yoksa)
+    SON
+
+    // --- Ana döngü: adım adım karıştırma ---
+    BASLA_ADIM:
+    baslangicDist ← DISTANCE(MEVCUT, HEDEF)
+    YAZ("Başlangıç uzaklık: ", baslangicDist)
+
+    WHILE ITER < MAX_ADIM DO
+        ITER ← ITER + 1
+
+        // 1) En iyi aday karışımı bul
+        aday ← BEST_MIX_CANDIDATE(MEVCUT, HEDEF, PALET, ADIM_ORANLARI)
+
+        // 2) Eğer hiçbir aday hedefe yaklaştırmıyorsa daha küçük oranları dene veya dur
+        EĞER aday = NULL İSE
+            YAZ("Daha fazla iyileşme sağlanamıyor. Döngü sonlandırılıyor.")
+            BREAK
+        SON
+
+        // 3) Adayı uygula
+        MEVCUT ← aday.sonuc
+        YAZ("Adım ", ITER, ": Karıştırılan renk = ", aday.renk, ", oran = ", aday.oran)
+        YAZ("Yeni renk = ", MEVCUT, ", kalan uzaklık = ", aday.yeniDist)
+
+        // 4) Bitiş kontrolü
+        EĞER aday.yeniDist ≤ TOLERANS İSE
+            YAZ("Hedefe ulaşıldı. İterasyon: ", ITER)
+            BREAK
+        SON
+
+        // 5) İsteğe bağlı: eğer azalma çok küçükse, oran listesini küçült
+        EĞER aday.yeniDist >= baslangicDist - 0.5 İSE
+            // çok az ilerleme, daha küçük oran dene (örneğin oran listesini daha ince yap)
+            ADIM_ORANLARI ← [0.08, 0.04, 0.02]
+        SON
+
+        baslangicDist ← DISTANCE(MEVCUT, HEDEF)
+    SON WHILE
+
+    SONUÇ_DIST ← DISTANCE(MEVCUT, HEDEF)
+    YAZ("Algoritma bitti. Son uzaklık: ", SONUÇ_DIST)
+    YAZ("Son renk: ", MEVCUT)
+    YAZ("Toplam adım: ", ITER)
+
+BİTİR
+ 
