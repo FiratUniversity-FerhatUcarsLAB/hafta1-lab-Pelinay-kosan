@@ -1,4 +1,74 @@
-Öğrenci No:
-AD-SOYAD:
+Öğrenci No:250542002
+AD-SOYAD:Pelinay KOŞAN
 
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+
+
+BAŞLA
+
+    // Telefon rehberi başlangıç listesi
+    REHBER ← [
+        {AD: "Ahmet", TELEFON: "0532 111 22 33"},
+        {AD: "Zeynep", TELEFON: "0534 222 33 44"},
+        {AD: "Burak", TELEFON: "0543 333 44 55"}
+    ]
+
+    SISTEM_DEVAM ← TRUE
+
+    WHILE SISTEM_DEVAM = TRUE DO
+        YAZ("===== TELEFON REHBERİ =====")
+        YAZ("1. Yeni kişi ekle")
+        YAZ("2. Tüm kişileri görüntüle")
+        YAZ("3. Rehberi alfabetik sırala")
+        YAZ("4. Çıkış")
+
+        SECIM ← KULLANICIDAN_VERI_AL("Seçiminizi giriniz: ")
+
+        // 1. Yeni kişi ekleme
+        EĞER SECIM = 1 İSE
+            YENI_AD ← KULLANICIDAN_VERI_AL("Kişinin adını giriniz: ")
+            YENI_TELEFON ← KULLANICIDAN_VERI_AL("Kişinin telefon numarasını giriniz: ")
+
+            // Yeni kişi oluştur ve ekle
+            YENI_KISI ← {AD: YENI_AD, TELEFON: YENI_TELEFON}
+            REHBER ← REHBER ∪ [YENI_KISI]
+
+            YAZ("Yeni kişi başarıyla eklendi!")
+
+        // 2. Tüm kişileri görüntüleme
+        EĞER SECIM = 2 İSE
+            YAZ("----- REHBERDEKİ KİŞİLER -----")
+            HER_BIR KISI İÇİN REHBER
+                YAZ(KISI.AD, " - ", KISI.TELEFON)
+            SON
+
+        // 3. Alfabetik sıralama
+        EĞER SECIM = 3 İSE
+            YAZ("Rehber alfabetik olarak sıralanıyor...")
+
+            // Basit sıralama algoritması (Bubble Sort mantığı)
+            N ← UZUNLUK(REHBER)
+
+            FOR I ← 0'DAN N-1'E KADAR
+                FOR J ← 0'DAN N-I-2'YE KADAR
+                    EĞER REHBER[J].AD > REHBER[J+1].AD İSE
+                        TEMP ← REHBER[J]
+                        REHBER[J] ← REHBER[J+1]
+                        REHBER[J+1] ← TEMP
+                    SON
+                SON
+            SON
+
+            YAZ("Rehber A-Z sırasına göre düzenlendi!")
+
+        // 4. Çıkış
+        EĞER SECIM = 4 İSE
+            YAZ("Sistemden çıkılıyor...")
+            SISTEM_DEVAM ← FALSE
+        SON
+
+        YAZ("\n")  // Yeni satır boşluğu
+
+    SON WHILE
+
+BİTİR
