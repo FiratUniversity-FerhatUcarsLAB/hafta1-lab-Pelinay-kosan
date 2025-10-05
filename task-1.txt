@@ -1,4 +1,81 @@
-Öğrenci No:
-AD-SOYAD:
+Öğrenci No:250542002
+AD-SOYAD:Pelinay KOŞAN
 
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+
+
+BAŞLA
+
+    // Başlangıç değerleri
+    SKOR ← 0
+    SAGLIK ← 100
+    ZIRH ← 50
+    MERMI ← 30
+    KILL ← 0
+    GUVENLI_BOLGE ← ILK_BOLGE()
+    OYUN_DEVAM ← TRUE
+
+    // Uçaktan atlama
+    KONUM ← EN_AZ_RISKLI_BOLGEYI_SEC()
+    PARAŞÜTLE_IN(KONUM)
+
+    // Ana oyun döngüsü
+    WHILE OYUN_DEVAM = TRUE DO
+
+        // Etrafı tara
+        YAKIN_DUSMAN_VAR_MI ← DUSMAN_TARA(KONUM)
+
+        // Ekipman topla
+        EĞER YAKIN_EKIPMAN_VAR_MI() = TRUE İSE
+            EKIPMAN_TOPLA()
+            SAGLIK ← SAGLIK + 10
+            MERMI ← MERMI + 15
+            ZIRH ← ZIRH + 5
+        SON
+
+        // Düşman varsa çatışma kararı
+        EĞER YAKIN_DUSMAN_VAR_MI = TRUE İSE
+            EĞER DUSMAN_USTUN_MU() = FALSE İSE
+                SALDIR()
+                KILL ← KILL + 1
+                SKOR ← SKOR + 100
+            DEĞİLSE
+                SAKLAN()
+                BEKLE(5)
+            SON
+        SON
+
+        // Güvenli bölge kontrolü
+        EĞER KONUM_GUVENLI_MI(KONUM, GUVENLI_BOLGE) = FALSE İSE
+            YAZ("Güvenli bölgeye hareket ediliyor...")
+            KONUM ← GUVENLI_BOLGEYE_GIT()
+            SKOR ← SKOR + 10
+        SON
+
+        // Sağlık durumu kontrolü
+        EĞER SAGLIK ≤ 30 İSE
+            EĞER ILAC_VAR_MI() = TRUE İSE
+                SAGLIK ← SAGLIK + 50
+                KULLAN("Bantaj")
+            DEĞİLSE
+                SAKLAN()
+            SON
+        SON
+
+        // Yeni güvenli bölge oluştur
+        GUVENLI_BOLGE ← YENI_BOLGE()
+
+        // Oyun bitiş koşulu
+        EĞER SAGLIK ≤ 0 VEYA OYUN_BITTIMI() = TRUE İSE
+            OYUN_DEVAM ← FALSE
+        SON
+
+    SON WHILE
+
+    // Oyun Sonu
+    SKOR ← SKOR + (KILL * 50)
+    YAZ("Oyun bitti!")
+    YAZ("Toplam KILL: ", KILL)
+    YAZ("Toplam SKOR: ", SKOR)
+
+BİTİR
