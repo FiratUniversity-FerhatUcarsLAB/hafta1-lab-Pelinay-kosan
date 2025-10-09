@@ -173,3 +173,4 @@ BAŞLA
     YAZ("Selfie süreci tamamlandı. İyi çekimler!")
 
 BİTİR
+Mükemmel selfie çekme adımları ile ilgili aşama aşama bir yazılım oluştur bu yazılımı pseudocode ile yaz
