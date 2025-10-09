@@ -79,3 +79,5 @@ BAŞLA
     YAZ("Toplam SKOR: ", SKOR)
 
 BİTİR
+
+Bana favori oyunumda yüksek skor almam için gerekli olan aşamaları teker teker bir kod halinde yaz bunu yazarken koşul ve döngüler içeren bir yazılım kur ve bu yazılımı pseudocode ile yaz 
