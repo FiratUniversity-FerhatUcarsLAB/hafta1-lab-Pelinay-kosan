@@ -106,4 +106,5 @@ FONKSIYON TAHMIN_ET(KONUM, EĞILIM)
         DÖNDÜR "NÖTR"
     SON
 SON FONKSIYON
+monopoly'de karar verme mantığını ve rakiplerini öngörmeyi içeren ürün tipini teker teker aşamalarıyla bir yazılımm kur ve bu yazılımı pseudocode ile yaz
 
