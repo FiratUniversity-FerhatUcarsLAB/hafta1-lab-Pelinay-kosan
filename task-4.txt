@@ -104,3 +104,4 @@ BAŞLA
 BİTİR
 
  Renkleri karıştırarak hedef rengi bulma ile ilgili aşama aşama ilerleyen bir yazılım yaz ve bu yazılımda pseudocode kullan 
+ Renkleri karıştırarak hedef rengi bulma ile ilgili aşama aşama ilerleyen bir yazılım yaz ve bu yazılımda pseudocode kullan ve açıklayıcı bir şekilde yaz
