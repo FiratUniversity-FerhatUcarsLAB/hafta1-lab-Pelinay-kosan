@@ -102,4 +102,5 @@ BAŞLA
     YAZ("Toplam adım: ", ITER)
 
 BİTİR
- 
+
+ Renkleri karıştırarak hedef rengi bulma ile ilgili aşama aşama ilerleyen bir yazılım yaz ve bu yazılımda pseudocode kullan 
