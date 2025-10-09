@@ -72,3 +72,5 @@ BAŞLA
     SON WHILE
 
 BİTİR
+
+Kütüphanede kitap arama sistemi ile ilgili bir yazılım yaz ve bu yazılımı pseudocode ile yaz
